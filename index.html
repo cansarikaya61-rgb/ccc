@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="theme-color" content="#04070d"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><title>CARVIS CORE C · Beta 1.00</title>
+<style>
+:root{--bg:#04070d;--navy:#0a1730;--ink:#1b2230;--cy:#3de8ff;--bl:#3b7bff;--tx:#e6f1ff;--mu:#8aa0bd;--ok:#4ade80;--wa:#fbbf24;--ln:rgba(61,232,255,.18);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+body{display:flex;flex-direction:column;background:radial-gradient(900px 500px at 50% 30%,#0b1f45 0,var(--bg) 70%)}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ln);flex-wrap:wrap}
+.logo{font-weight:700;letter-spacing:.08em;font-size:15px}.logo small{color:var(--mu);font-weight:400;letter-spacing:0}
+.tabs{display:flex;background:var(--ink);border-radius:99px;padding:3px;margin-left:auto}
+.tabs button{border:0;background:none;color:var(--mu);padding:7px 16px;border-radius:99px;font:inherit;cursor:pointer}
+.tabs button[aria-selected=true]{background:linear-gradient(90deg,var(--bl),var(--cy));color:#02101c;font-weight:600}
+.badge{font-size:12px;border:1px solid var(--ln);border-radius:99px;padding:3px 10px;color:var(--cy)}
+#modes{flex:1;min-height:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+#modes::-webkit-scrollbar{display:none}
+.panel{flex:0 0 100%;scroll-snap-align:start;overflow-y:auto;padding:16px;min-width:0}
+/* CARVIS */
+#cv{display:flex;flex-direction:column;align-items:center;text-align:center}
+.core{position:relative;width:min(56vw,230px);aspect-ratio:1;margin:18px 0 14px;display:grid;place-items:center}
+.core i{position:absolute;inset:0;border-radius:50%;border:2px solid var(--cy);border-left-color:transparent;border-right-color:transparent;animation:sp 9s linear infinite;box-shadow:0 0 30px rgba(61,232,255,.35)}
+.core i:nth-child(2){inset:14%;border-color:var(--bl);border-top-color:transparent;border-bottom-color:transparent;animation-duration:6s;animation-direction:reverse}
+.core i:nth-child(3){inset:28%;border-style:dotted;animation-duration:14s}
+.core b{width:30%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#fff 0,var(--cy) 35%,var(--bl) 70%,transparent 72%);box-shadow:0 0 50px var(--cy);animation:pu 3.2s ease-in-out infinite}
+.core.on b{animation-duration:.8s}
+@keyframes sp{to{transform:rotate(360deg)}}@keyframes pu{50%{transform:scale(1.18)}}
+@media(prefers-reduced-motion:reduce){.core i,.core b{animation:none}}
+#hello{font-size:20px;margin:4px 0 12px;max-width:22ch}
+#cvOut{width:100%;max-width:560px;text-align:left}
+.row{display:flex;gap:8px;width:100%;max-width:560px;margin-top:12px}
+input,textarea{flex:1;min-width:0;background:var(--ink);border:1px solid var(--ln);color:var(--tx);border-radius:12px;padding:11px 13px;font:inherit}
+.btn{border:1px solid var(--ln);background:var(--ink);color:var(--tx);border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer}
+.btn.pri{background:linear-gradient(90deg,var(--bl),var(--cy));color:#02101c;font-weight:600;border:0}
+.btn.mic.on{box-shadow:0 0 0 3px var(--cy)}
+.note{color:var(--mu);font-size:12.5px;margin-top:10px}
+/* GPT */
+.sub{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.sub button{white-space:nowrap}.sub .btn[aria-selected=true]{border-color:var(--cy);color:var(--cy)}
+.view{display:none;max-width:900px;margin:0 auto}.view.show{display:block}
+.msg{margin:10px 0;display:flex}.msg.u{justify-content:flex-end}
+.bub{max-width:min(100%,640px);background:var(--ink);border:1px solid var(--ln);border-radius:14px;padding:10px 14px;overflow-wrap:anywhere}
+.msg.u .bub{background:var(--navy);border-color:rgba(59,123,255,.5)}
+.sim{display:inline-block;font-size:11.5px;color:var(--wa);border:1px solid rgba(251,191,36,.4);border-radius:6px;padding:1px 7px;margin-bottom:6px}
+.pv h4{margin:6px 0 4px;color:var(--cy);font-size:14px}.pv ul{margin:0 0 6px;padding-left:20px}
+.pv .ult{margin-top:8px;padding:8px 10px;border-left:3px solid var(--bl);background:rgba(59,123,255,.1);border-radius:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--ink);border:1px solid var(--ln);border-radius:14px;padding:14px}
+.card h3{margin:0 0 6px;font-size:15px}.big{font-size:28px;font-weight:700;color:var(--cy)}
+.item{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--ln)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font-size:13px;border:1px solid var(--ln);border-radius:99px;padding:4px 11px;background:none;color:var(--tx);cursor:pointer}
+.tl{display:flex;gap:8px;align-items:center;margin:8px 0}
+dialog{background:var(--navy);color:var(--tx);border:1px solid var(--cy);border-radius:14px;max-width:min(92vw,420px)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">CARVIS CORE C <small>Beta 1.00</small></div>
+  <span class="badge" id="ed">FREE</span>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t0" aria-selected="true">CARVIS</button>
+    <button role="tab" id="t1" aria-selected="false">GPT</button>
+  </div>
+</header>
+
+<div id="modes">
+  <section class="panel" id="cv" aria-label="CARVIS-Modus">
+    <div class="core" id="core"><i></i><i></i><i></i><b></b></div>
+    <h1 id="hello" style="font-weight:600">Hallo. Ich bin C. Was kann ich für dich erledigen?</h1>
+    <div id="cvOut" aria-live="polite"></div>
+    <div class="row">
+      <button class="btn mic" id="mic" aria-label="Mikrofon: Spracheingabe starten">🎤</button>
+      <input id="cvIn" placeholder="Sprich oder schreibe, z. B. „Hey C, plane eine Reise“" aria-label="Eingabe">
+      <button class="btn pri" id="cvGo">Senden</button>
+    </div>
+    <div class="note">Hey-C-Dauerlauschen ist noch nicht umgesetzt. Nutze die Mikrofontaste. Wische nach links für den GPT-Modus.</div>
+  </section>
+
+  <section class="panel" id="gp" aria-label="GPT-Modus">
+    <div class="sub" role="tablist">
+      <button class="btn" data-v="chat" aria-selected="true">Chat</button>
+      <button class="btn" data-v="dash" aria-selected="false">Dashboard</button>
+      <button class="btn" data-v="proj" aria-selected="false">Projekte</button>
+      <button class="btn" data-v="mem" aria-selected="false">Gedächtnis</button>
+      <button class="btn" data-v="set" aria-selected="false">Einstellungen</button>
+    </div>
+    <div class="view show" id="v-chat">
+      <div id="log" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <div class="row" style="max-width:none"><input id="gIn" placeholder="Nachricht an C …" aria-label="Nachricht"><button class="btn pri" id="gGo">Senden</button></div>
+    </div>
+    <div class="view" id="v-dash"></div>
+    <div class="view" id="v-proj"></div>
+    <div class="view" id="v-mem"></div>
+    <div class="view" id="v-set"></div>
+  </section>
+</div>
+
+<dialog id="dlg"><p id="dlgT"></p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="dNo">Abbrechen</button><button class="btn pri" id="dYes">Bestätigen</button></div></dialog>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const KEY="ccc.beta100";
+let S={msgs:[],projects:[{id:1,name:"Mein erstes Projekt",notes:[]}],active:1,voice:true,ult:false};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+
+/* ---------- Demo-Engine (lokal, simuliert) ---------- */
+const TOP=[
+ {k:/trade|aktie|krypto|invest|börse|etf/i,t:"Trading-Vorschau",
+  need:["Budget, das du komplett verlieren könntest","Zeithorizont","Markt und Instrument"],
+  steps:["Max. Einsatz festlegen (Empfehlung: unter 2 % deines Vermögens)","Stop-Loss und Zielmarke vor dem Einstieg definieren","Mit Demo-Konto üben, bevor echtes Geld fließt"],
+  risk:["Totalverlust des Einsatzes ist möglich","Kleines Budget und hohe Gewinnchance schließen sich meist aus (Hebel erhöht das Verlustrisiko)","Keine Strategie garantiert Gewinne"],
+  chart:[["Totalverlust",-100],["Stop-Loss",-20],["Seitwärts",0],["Zielmarke",30]]},
+ {k:/termin|meeting|kalender|treffen/i,t:"Termin-Vorschau",need:["Datum und Uhrzeit","Teilnehmer","Ort oder Link"],steps:["Zeitfenster prüfen","Einladungstext entwerfen","Erinnerung 15 Minuten vorher setzen"],risk:["Überschneidungen mit bestehenden Terminen"]},
+ {k:/mail|e-mail|nachricht schreiben/i,t:"E-Mail-Vorschau",need:["Empfänger","Ziel der Mail","Ton (formell/locker)"],steps:["Betreff mit klarer Aussage","Entwurf in drei Absätzen","Anhänge und Empfänger prüfen"],risk:["Falscher Empfänger","Ungewollter Ton"]},
+ {k:/einkauf|kaufen|bestell|shop/i,t:"Einkaufs-Vorschau",need:["Budget","Muss-Kriterien","Lieferfrist"],steps:["3 Optionen vergleichen","Gesamtkosten inkl. Versand prüfen","Rückgabebedingungen lesen"],risk:["Versteckte Kosten","Unseriöse Händler"]},
+ {k:/reise|flug|urlaub|hotel/i,t:"Reise-Vorschau",need:["Zeitraum","Budget","Reiseziel oder Stimmung"],steps:["Zielregion eingrenzen","Reisezeit und Preisniveau vergleichen","Grobplan pro Tag erstellen"],risk:["Einreise- und Impfbestimmungen","Stornobedingungen"]},
+ {k:/webseite|website|app|homepage|programmier/i,t:"Web-/App-Vorschau",need:["Zweck und Zielgruppe","Kernfunktionen","Hosting-Wunsch (kostenlos?)"],steps:["Seitenstruktur skizzieren","Kernfunktion zuerst bauen","Kostenlos testen, z. B. über GitHub Pages"],risk:["Funktionsumfang zu groß für den Start"]},
+ {k:/dokument|bericht|brief|text|zusammenfass/i,t:"Dokument-Vorschau",need:["Zweck","Umfang","Zielleser"],steps:["Gliederung","Rohfassung","Prüfen und glätten"],risk:["Fehlende Quellen bei Fakten"]},
+ {k:/recherche|suche|finde heraus/i,t:"Recherche-Vorschau",need:["Fragestellung","Zeitraum","Quellentypen"],steps:["Suchbegriffe sammeln","Quellen vergleichen","Ergebnis zusammenfassen"],risk:["Veraltete oder einseitige Quellen"]},
+ {k:/projekt|aufgabe|todo|automat/i,t:"Projekt-Vorschau",need:["Ziel","Deadline","Beteiligte"],steps:["Ziel in Teilaufgaben zerlegen","Reihenfolge festlegen","Wöchentlich prüfen"],risk:["Unklare Verantwortlichkeiten"]}
+];
+function demo(q){
+  if(/^(hallo|hi|hey)\b/i.test(q.trim())&&q.length<20)return{plain:"Hallo! Sag mir, was du erledigen möchtest. Ich bereite es als Vorschau vor."};
+  const t=TOP.find(x=>x.k.test(q));
+  if(!t)return{plain:"Ich habe dich verstanden, aber dafür gibt es in der Demo-Engine noch keine Vorlage. Probiere: Trade, Termin, E-Mail, Einkauf, Reise, Website, Dokument, Recherche oder Projekt."};
+  return{t};
+}
+function renderPv(t,q){
+  const d=el("div","pv");
+  d.append(el("h4",0,t.t));
+  const sec=(h,a)=>{d.append(el("h4",0,h));const u=el("ul");a.forEach(x=>u.append(el("li",0,x)));d.append(u)};
+  sec("Das brauche ich von dir",t.need);sec("Vorgehen",t.steps);sec("Risiken",t.risk);
+  if(t.chart){d.append(el("h4",0,"Beispiel-Szenarien (Illustration, keine Prognose)"));d.append(chart(t.chart))}
+  const u=el("div","ult","Ich habe dir die Vorgehensweise vorbereitet. In der CCC Ultimate Edition könnte ich dich bei der Umsetzung unterstützen. Ultimate ist noch nicht verfügbar.");
+  d.append(u);
+  const b=el("button","btn",'In Projekt merken');b.onclick=()=>{const p=proj();p.notes.push({t:t.t,q,d:Date.now()});save();b.textContent="Gemerkt ✓";b.disabled=true;drawAll()};
+  d.append(b);return d;
+}
+function chart(rows){
+  const W=300,H=120,m=Math.max(...rows.map(r=>Math.abs(r[1]))),bw=W/rows.length;
+  let s=`<svg viewBox="0 0 ${W} ${H+24}" width="100%" role="img" aria-label="Szenario-Balken"><line x1="0" x2="${W}" y1="${H/2}" y2="${H/2}" stroke="#8aa0bd" stroke-width=".5"/>`;
+  rows.forEach((r,i)=>{const h=Math.abs(r[1])/m*(H/2-6),y=r[1]>=0?H/2-h:H/2;
+    s+=`<rect x="${i*bw+10}" y="${y}" width="${bw-20}" height="${Math.max(h,2)}" rx="3" fill="${r[1]<0?'#fb7185':'#3de8ff'}"/><text x="${i*bw+bw/2}" y="${H+14}" text-anchor="middle" font-size="9" fill="#8aa0bd">${r[0]} ${r[1]>0?'+':''}${r[1]}%</text>`});
+  const w=el("div");w.innerHTML=s+"</svg>";return w;
+}
+
+/* ---------- Chat ---------- */
+const proj=()=>S.projects.find(p=>p.id===S.active)||S.projects[0];
+function bubble(m){
+  const w=el("div","msg "+(m.r==="u"?"u":"")),b=el("div","bub");
+  if(m.r==="u")b.textContent=m.x;
+  else{b.append(el("span","sim","SIMULIERT · lokale Demo-Engine, keine echte KI"));
+    if(m.plain)b.append(el("div",0,m.plain));
+    if(m.t)b.append(renderPv(m.t,m.q))}
+  w.append(b);return w;
+}
+function send(q){
+  q=q.trim();if(!q)return;
+  q=q.replace(/^\s*hey c[,!:]?\s*/i,"")||q;
+  const r=demo(q);
+  S.msgs.push({r:"u",x:q});S.msgs.push(Object.assign({r:"c",q},r));
+  if(S.msgs.length>60)S.msgs=S.msgs.slice(-60);
+  save();drawAll();
+  if(S.voice&&"speechSynthesis"in window){try{
+    const u=new SpeechSynthesisUtterance(r.plain||`${r.t.t} ist fertig. In der Ultimate Edition könnte ich dich bei der Umsetzung unterstützen.`);u.lang="de-DE";speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+}
+function drawChat(){
+  const log=$("#log");log.replaceChildren(...S.msgs.map(bubble));
+  const last=S.msgs[S.msgs.length-1];
+  $("#cvOut").replaceChildren(...(last&&last.r==="c"?[bubble(last)]:[]));
+  log.scrollTop=log.scrollHeight;
+}
+["cv","g"].forEach(p=>{
+  const i=$(p==="cv"?"#cvIn":"#gIn"),g=$(p==="cv"?"#cvGo":"#gGo");
+  const go=()=>{send(i.value);i.value=""};g.onclick=go;i.onkeydown=e=>{if(e.key==="Enter")go()};
+});
+const sample=["Setze einen Trade mit wenig Budget","Plane eine Reise nach Lissabon","Schreibe eine E-Mail an meinen Chef","Erstelle eine Website für mein Café"];
+$("#chips").replaceChildren(...sample.map(s=>{const c=el("button","chip",s);c.onclick=()=>send(s);return c}));
+
+/* ---------- Sprache ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+$("#mic").onclick=()=>{
+  if(!SR){$("#cvOut").replaceChildren(el("div","note","Spracheingabe wird von diesem Browser nicht unterstützt. Nutze Chrome, Edge oder Safari oder tippe deine Anfrage."));return}
+  const core=$("#core"),mic=$("#mic");
+  if(rec){rec.stop();return}
+  try{rec=new SR();rec.lang="de-DE";rec.interimResults=false;
+    rec.onstart=()=>{core.classList.add("on");mic.classList.add("on")};
+    rec.onresult=e=>send(e.results[0][0].transcript);
+    rec.onerror=e=>{$("#cvOut").replaceChildren(el("div","note","Mikrofon nicht verfügbar ("+e.error+"). Erlaube den Mikrofonzugriff in den Browsereinstellungen oder tippe stattdessen."))};
+    rec.onend=()=>{core.classList.remove("on");mic.classList.remove("on");rec=null};
+    rec.start()}catch(e){rec=null}
+};
+
+/* ---------- Ansichten ---------- */
+function drawDash(){
+  const v=$("#v-dash"),n=S.msgs.filter(m=>m.r==="u").length,notes=S.projects.reduce((a,p)=>a+p.notes.length,0);
+  v.replaceChildren();const g=el("div","grid");
+  const c=(h,b,s)=>{const d=el("div","card");d.append(el("h3",0,h),el("div","big",b));if(s)d.append(el("div","note",s));g.append(d)};
+  c("Anfragen",n,"in diesem Browser gespeichert");c("Projekte",S.projects.length);c("Gemerkte Vorschauen",notes);
+  const e=el("div","card");e.append(el("h3",0,"Status"));
+  [["Edition",S.ult?"Ultimate (Demo-Schalter)":"Free"],["KI-Verbindung","keine, lokale Demo"],["Sprache","Browserfunktion"],["Hey-C-Wake-Word","geplant"]].forEach(([a,b])=>{const r=el("div","item");r.append(el("span",0,a),el("span",0,b));e.append(r)});
+  g.append(e);v.append(g);
+}
+function drawProj(){
+  const v=$("#v-proj");v.replaceChildren();
+  const r=el("div","row");r.style.maxWidth="none";const i=el("input");i.placeholder="Neues Projekt";i.setAttribute("aria-label","Projektname");
+  const b=el("button","btn pri","Anlegen");b.onclick=()=>{if(!i.value.trim())return;const id=Date.now();S.projects.push({id,name:i.value.trim(),notes:[]});S.active=id;save();drawAll()};
+  r.append(i,b);v.append(r);
+  const g=el("div","grid");g.style.marginTop="12px";
+  S.projects.forEach(p=>{const d=el("div","card");d.append(el("h3",0,p.name+(p.id===S.active?" (aktiv)":"")));
+    if(!p.notes.length)d.append(el("div","note","Noch leer. Wähle „In Projekt merken“ unter einer Vorschau."));
+    p.notes.forEach(n=>{const x=el("div","item");x.append(el("span",0,n.t),el("span","note",new Date(n.d).toLocaleDateString("de-DE")));d.append(x)});
+    const a=el("button","btn","Aktiv setzen");a.onclick=()=>{S.active=p.id;save();drawAll()};d.append(a);g.append(d)});
+  v.append(g);
+}
+function ask(txt,fn){$("#dlgT").textContent=txt;const d=$("#dlg");$("#dYes").onclick=()=>{d.close();fn()};$("#dNo").onclick=()=>d.close();d.showModal()}
+function drawMem(){
+  const v=$("#v-mem");v.replaceChildren();
+  const d=el("div","card");d.append(el("h3",0,"Gemeinsames Gedächtnis (CARVIS + GPT)"),
+    el("div","note",`${S.msgs.length} Nachrichten und ${S.projects.reduce((a,p)=>a+p.notes.length,0)} Notizen liegen nur lokal in diesem Browser. Gib hier keine Passwörter ein.`));
+  S.msgs.filter(m=>m.r==="u").slice(-15).forEach(m=>{const r=el("div","item");r.append(el("span",0,m.x));d.append(r)});
+  const b=el("button","btn","Gesamten Verlauf löschen");b.style.marginTop="10px";
+  b.onclick=()=>ask("Verlauf und alle Projekt-Notizen unwiderruflich löschen?",()=>{S.msgs=[];S.projects.forEach(p=>p.notes=[]);save();drawAll()});
+  d.append(b);v.append(d);
+}
+function drawSet(){
+  const v=$("#v-set");v.replaceChildren();const d=el("div","card");d.append(el("h3",0,"Einstellungen"));
+  const row=(l,on,fn)=>{const r=el("div","item");const bt=el("button","btn",on?"An":"Aus");bt.setAttribute("aria-pressed",on);bt.onclick=fn;r.append(el("span",0,l),bt);d.append(r)};
+  row("Sprachausgabe",S.voice,()=>{S.voice=!S.voice;save();drawSet()});
+  row("Ultimate-Vorschau (nur Anzeige, keine Funktionen)",S.ult,()=>{S.ult=!S.ult;save();drawAll()});
+  d.append(el("div","note","Sicherheit: Diese Version führt keine Zahlungen, Käufe oder Trades aus und speichert keine Zugangsdaten. Alle Antworten stammen aus einer lokalen Demo-Engine. Kosten: 0 €."));
+  v.append(d);
+}
+function drawAll(){$("#ed").textContent=S.ult?"ULTIMATE (Vorschau)":"FREE";drawChat();drawDash();drawProj();drawMem();drawSet()}
+
+/* ---------- Navigation ---------- */
+const modes=$("#modes");
+function go(i){modes.scrollTo({left:i*modes.clientWidth,behavior:"smooth"})}
+$("#t0").onclick=()=>go(0);$("#t1").onclick=()=>go(1);
+modes.addEventListener("scroll",()=>{const i=Math.round(modes.scrollLeft/modes.clientWidth);$("#t0").setAttribute("aria-selected",i===0);$("#t1").setAttribute("aria-selected",i===1)},{passive:true});
+$$(".sub .btn").forEach(b=>b.onclick=()=>{$$(".sub .btn").forEach(x=>x.setAttribute("aria-selected",x===b));$$(".view").forEach(v=>v.classList.toggle("show",v.id==="v-"+b.dataset.v))});
+drawAll();
+if("serviceWorker"in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
